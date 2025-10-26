@@ -28,12 +28,12 @@ func main() {
 
 	loadConfig, err := configs.LoadConfig()
 	if err != nil {
-		fmt.Printf("failed to load config: %v", err)
+		log.Infof("Failed to load config: %v", err)
 	}
-	
+
 	database, err := pkg.InitDatabase(loadConfig.DatabaseConfig)
 	if err != nil {
-		fmt.Printf("failed to connect to database: %v", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
 	cache := pkg.NewRedisCache(loadConfig.RedisConfig)
@@ -46,14 +46,11 @@ func main() {
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	r := mux.NewRouter()
-	//api := r.PathPrefix("/orders").Subrouter()
-	//api.HandleFunc("", orderHandler.CreateOrder).Methods("POST")
-	//api.HandleFunc("/product/{productId}", orderHandler.GetByProductID).Methods("GET")
 	r.HandleFunc("/orders", orderHandler.CreateOrder).Methods("POST")
 	r.HandleFunc("/orders/product/{productId}", orderHandler.GetByProductID).Methods("GET")
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", 3001),
+		Addr:    fmt.Sprintf(":%s", loadConfig.Port),
 		Handler: r,
 	}
 

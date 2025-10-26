@@ -24,11 +24,9 @@ func InitDatabase(config configs.DatabaseConfig) (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(5)
-	db.SetConnMaxLifetime(time.Hour)
-
-	fmt.Println("✅ Database connected successfully")
+	db.SetMaxOpenConns(1000)
+	db.SetMaxIdleConns(500)
+	db.SetConnMaxLifetime(2 * time.Hour)
 
 	return db, nil
 }

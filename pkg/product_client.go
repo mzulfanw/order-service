@@ -7,10 +7,17 @@ import (
 )
 
 type Product struct {
-	ID    string  `json:"id"`
-	Name  string  `json:"name"`
-	Price float64 `json:"price"`
-	Qty   int     `json:"qty"`
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	Price     float64 `json:"price"`
+	Qty       int     `json:"qty"`
+	CreatedAt string  `json:"createdAt"`
+}
+
+type ProductResponse struct {
+	Success bool    `json:"success"`
+	Message string  `json:"message"`
+	Data    Product `json:"data"`
 }
 
 type ProductClient interface {
@@ -41,11 +48,10 @@ func (p *productClient) GetProduct(id string) (*Product, error) {
 		return nil, fmt.Errorf("product not found (status %d)", resp.StatusCode)
 	}
 
-	var product Product
-	if err := json.NewDecoder(resp.Body).Decode(&product); err != nil {
+	var pr ProductResponse
+	if err := json.NewDecoder(resp.Body).Decode(&pr); err != nil {
 		return nil, fmt.Errorf("failed to decode product response: %w", err)
 	}
 
-	fmt.Printf("✅ Product fetched: %+v\n", product)
-	return &product, nil
+	return &pr.Data, nil
 }

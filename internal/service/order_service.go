@@ -41,6 +41,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, productID string, quanti
 		ProductID:  productID,
 		TotalPrice: product.Price * float64(quantity),
 		Status:     "CREATED",
+		Quantity:   quantity,
 	}
 
 	if err := s.repo.Create(ctx, order); err != nil {
@@ -52,7 +53,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, productID string, quanti
 }
 
 func (s *OrderService) GetByProductID(ctx context.Context, productID string) ([]domain.Order, error) {
-	if cached, found := s.cache.Get(fmt.Sprintf("orders:%d", productID)); found {
+	if cached, found := s.cache.Get(fmt.Sprintf("orders:%s", productID)); found {
 		var orders []domain.Order
 		json.Unmarshal(cached, &orders)
 		return orders, nil
@@ -62,6 +63,6 @@ func (s *OrderService) GetByProductID(ctx context.Context, productID string) ([]
 		return nil, err
 	}
 	data, _ := json.Marshal(orders)
-	s.cache.Set(fmt.Sprintf("orders:%d", productID), data)
+	s.cache.Set(fmt.Sprintf("orders:%s", productID), data)
 	return orders, nil
 }
